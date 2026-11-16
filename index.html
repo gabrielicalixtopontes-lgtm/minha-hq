@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>O Conto da Maçã Envenenada</title>
+<style>
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  body {
+    font-family: 'Comic Sans MS', 'Chalkboard SE', 'Comic Neue', cursive, sans-serif;
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+    min-height: 100vh;
+    padding: 20px;
+    color: #e0e0e0;
+  }
+
+  header {
+    text-align: center;
+    margin-bottom: 30px;
+    padding: 20px;
+  }
+
+  header h1 {
+    font-size: clamp(1.8rem, 5vw, 3rem);
+    color: #e94560;
+    text-shadow: 2px 2px 0 #000, 4px 4px 0 rgba(233, 69, 96, 0.5);
+    letter-spacing: 2px;
+  }
+
+  header p {
+    margin-top: 10px;
+    font-size: clamp(0.9rem, 2vw, 1.1rem);
+    color: #a0a0a0;
+  }
+
+  .comic-container {
+    max-width: 1100px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+  }
+
+  .scene {
+    position: relative;
+    background: #000;
+    border: 5px solid #fff;
+    border-radius: 8px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.8), inset 0 0 0 2px #000;
+    overflow: hidden;
+    animation: fadeIn 0.8s ease;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .scene img {
+    display: block;
+    width: 100%;
+    height: auto;
+    user-select: none;
+  }
+
+  /* Balões de diálogo HTML sobrepostos */
+  .bubble {
+    position: absolute;
+    background: #fff;
+    border: 3px solid #000;
+    border-radius: 20px;
+    padding: 12px 18px;
+    font-size: clamp(0.75rem, 2vw, 1.1rem);
+    line-height: 1.35;
+    color: #000;
+    max-width: 45%;
+    box-shadow: 4px 4px 0 rgba(0,0,0,0.5);
+    z-index: 10;
+    font-weight: bold;
+  }
+
+  /* Rabinho do balão (falado) */
+  .bubble.tail-down::after {
+    content: '';
+    position: absolute;
+    bottom: -20px;
+    left: 30px;
+    border-width: 20px 12px 0 12px;
+    border-style: solid;
+    border-color: #000 transparent transparent transparent;
+  }
+  .bubble.tail-down::before {
+    content: '';
+    position: absolute;
+    bottom: -14px;
+    left: 33px;
+    border-width: 17px 9px 0 9px;
+    border-style: solid;
+    border-color: #fff transparent transparent transparent;
+    z-index: 1;
+  }
+
+  /* Rabinho do balão para cima */
+  .bubble.tail-up::after {
+    content: '';
+    position: absolute;
+    top: -20px;
+    left: 30px;
+    border-width: 0 12px 20px 12px;
+    border-style: solid;
+    border-color: transparent transparent #000 transparent;
+  }
+  .bubble.tail-up::before {
+    content: '';
+    position: absolute;
+    top: -14px;
+    left: 33px;
+    border-width: 0 9px 17px 9px;
+    border-style: solid;
+    border-color: transparent transparent #fff transparent;
+    z-index: 1;
+  }
+
+  /* Rabinho de pensamento (bolinhas) */
+  .bubble.thought::after {
+    content: '';
+    position: absolute;
+    bottom: -25px;
+    left: 25px;
+    width: 10px;
+    height: 10px;
+    background: #fff;
+    border: 2px solid #000;
+    border-radius: 50%;
+    box-shadow: -12px 12px 0 -2px #fff, -12px 12px 0 0 #000;
+  }
+  .bubble.thought::before {
+    display: none;
+  }
+
+  /* Posições dos balões */
+  .bubble.top-left      { top: 8%;  left: 5%;  }
+  .bubble.top-right     { top: 8%;  right: 5%; }
+  .bubble.mid-left      { top: 40%; left: 5%;  }
+  .bubble.mid-right     { top: 40%; right: 5%; }
+  .bubble.bottom-left   { bottom: 14%; left: 5%; }
+  .bubble.bottom-right  { bottom: 14%; right: 5%; }
+
+  /* Botão Ouvir */
+  .btn-listen {
+    position: absolute;
+    bottom: 15px;
+    right: 15px;
+    background: #e94560;
+    color: #fff;
+    border: 3px solid #fff;
+    border-radius: 30px;
+    padding: 8px 18px;
+    font-family: inherit;
+    font-weight: bold;
+    font-size: clamp(0.8rem, 1.6vw, 1rem);
+    cursor: pointer;
+    box-shadow: 3px 3px 0 rgba(0,0,0,0.6);
+    transition: all 0.15s ease;
+    z-index: 20;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .btn-listen:hover {
+    transform: translate(-1px, -1px);
+    box-shadow: 4px 4px 0 rgba(0,0,0,0.6);
+    background: #ff5e7a;
+  }
+
+  .btn-listen:active {
+    transform: translate(2px, 2px);
+    box-shadow: 1px 1px 0 rgba(0,0,0,0.6);
+  }
+
+  .btn-listen.speaking {
+    background: #ffd700;
+    color: #000;
+    border-color: #000;
+    animation: pulse 0.8s infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+  }
+
+  /* Ajustes para telas pequenas */
+  @media (max-width: 600px) {
+    body { padding: 10px; }
+    .comic-container { gap: 25px; }
+    .scene { border-width: 3px; }
+    .bubble {
+      padding: 8px 12px;
+      border-width: 2px;
+      border-radius: 14px;
+      max-width: 60%;
+      font-size: 0.75rem;
+    }
+    .bubble.tail-down::after { bottom: -14px; left: 20px; border-width: 14px 8px 0 8px; }
+    .bubble.tail-down::before { bottom: -10px; left: 22px; border-width: 12px 6px 0 6px; }
+    .bubble.tail-up::after { top: -14px; left: 20px; border-width: 0 8px 14px 8px; }
+    .bubble.tail-up::before { top: -10px; left: 22px; border-width: 0 6px 12px 6px; }
+    .btn-listen {
+      padding: 6px 12px;
+      border-width: 2px;
+      bottom: 10px;
+      right: 10px;
+      font-size: 0.8rem;
+    }
+  }
+
+  footer {
+    text-align: center;
+    margin-top: 40px;
+    padding: 20px;
+    color: #a0a0a0;
+    font-size: 0.9rem;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🍎 O Conto da Maçã Envenenada</h1>
+  <p>Uma história sombria em quadrinhos — clique em "Ouvir" para escutar os diálogos!</p>
+</header>
+
+<main class="comic-container">
+
+  <!-- CENA 1: A Bruxa prepara o feitiço -->
+  <section class="scene">
+    <img src="imagens/cena1.png" alt="A bruxa preparando a maçã envenenada">
+    <div class="bubble top-right tail-down">
+      "Este é o meu plano perfeito... ninguém poderá resistir a esta fruta."
+    </div>
+    <button class="btn-listen" data-scene="1" aria-label="Ouvir diálogos da cena 1">🔊 Ouvir</button>
+  </section>
+
+  <!-- CENA 2: A Bruxa oferece a maçã no mercado -->
+  <section class="scene">
+    <img src="imagens/cena2.png" alt="A bruxa oferecendo a maçã à jovem no mercado">
+    <div class="bubble mid-left tail-down">
+      "Pegue, minha jovem. É a maçã mais doce que você já provou."
+    </div>
+    <button class="btn-listen" data-scene="2" aria-label="Ouvir diálogos da cena 2">🔊 Ouvir</button>
+  </section>
+
+  <!-- CENA 3: A jovem com a maçã na floresta -->
+  <section class="scene">
+    <img src="imagens/cena3.png" alt="A jovem olhando desconfiada para a maçã">
+    <div class="bubble top-right thought">
+      "Algo não parece certo... O cheiro e este brilho estranho..."
+    </div>
+    <button class="btn-listen" data-scene="3" aria-label="Ouvir diálogos da cena 3">🔊 Ouvir</button>
+  </section>
+
+  <!-- CENA 4: A jovem caiu envenenada -->
+  <section class="scene">
+    <img src="imagens/cena4.png" alt="A jovem caída na floresta e a bruxa sorrindo">
+    <div class="bubble top-left tail-down">
+      "Agora ela está sob o meu feitiço... e nada poderá salvá-la!"
+    </div>
+    <button class="btn-listen" data-scene="4" aria-label="Ouvir diálogos da cena 4">🔊 Ouvir</button>
+  </section>
+
+  <!-- CENA 5: O susto com o burro -->
+  <section class="scene">
+    <img src="imagens/cena5.png" alt="A jovem acorda assustada com um burro na floresta">
+    <div class="bubble top-left tail-down">
+      "Aaah! Que susto! De onde você saiu, burrinho?"
+    </div>
+    <div class="bubble bottom-right tail-up">
+      "Relaxe, mocinha! Eu vim te salvar!"
+    </div>
+    <button class="btn-listen" data-scene="5" aria-label="Ouvir diálogos da cena 5">🔊 Ouvir</button>
+  </section>
+
+</main>
+
+<footer>
+  ✨ Fim da história... por enquanto. ✨
+</footer>
+
+<script>
+  // Diálogos atualizados com base na sua história visual
+  const dialogues = {
+    1: [
+      "A bruxa sussurra: Este é o meu plano perfeito... ninguém poderá resistir a esta fruta."
+    ],
+    2: [
+      "A bruxa diz: Pegue, minha jovem. É a maçã mais doce que você já provou.",
+      "A jovem pensa: Hmm, parece uma maçã muito doce mesmo."
+    ],
+    3: [
+      "A jovem pensa: Algo não parece certo... O cheiro e este brilho estranho..."
+    ],
+    4: [
+      "A bruxa ri: Agora ela está sob o meu feitiço... e nada poderá salvá-la!"
+    ],
+    5: [
+      "A jovem grita: Aaah! Que susto! De onde você saiu, burrinho?",
+      "O burro responde: Relaxe, mocinha! Eu vim te salvar!"
+    ]
+  };
+
+  const synth = window.speechSynthesis;
+  let currentUtterance = null;
+  let currentButton = null;
+
+  function speakScene(sceneNumber, button) {
+    synth.cancel();
+
+    if (currentButton === button && synth.speaking) {
+      resetButton(currentButton);
+      currentButton = null;
+      return;
+    }
+
+    if (currentButton && currentButton !== button) {
+      resetButton(currentButton);
+    }
+
+    const lines = dialogues[sceneNumber];
+    if (!lines || lines.length === 0) return;
+
+    currentButton = button;
+    button.classList.add('speaking');
+    button.innerHTML = '🔊 Falando...';
+
+    let index = 0;
+
+    function speakNext() {
+      if (index >= lines.length) {
+        resetButton(button);
+        currentButton = null;
+        return;
+      }
+
+      const utterance = new SpeechSynthesisUtterance(lines[index]);
+      utterance.lang = 'pt-BR';
+      utterance.rate = 0.95;
+      utterance.pitch = 1.1; // Tom ligeiramente mais agudo para dar drama
+      utterance.volume = 1;
+
+      const voices = synth.getVoices();
+      const ptVoice = voices.find(v => v.lang.startsWith('pt')) || null;
+      if (ptVoice) utterance.voice = ptVoice;
+
+      utterance.onend = () => {
+        index++;
+        setTimeout(speakNext, 350);
+      };
+
+      utterance.onerror = (e) => {
+        console.warn('Erro na síntese de voz:', e);
+        resetButton(button);
+        currentButton = null;
+      };
+
+      currentUtterance = utterance;
+      synth.speak(utterance);
+    }
+
+    speakNext();
+  }
+
+  function resetButton(button) {
+    if (!button) return;
+    button.classList.remove('speaking');
+    button.innerHTML = '🔊 Ouvir';
+  }
+
+  document.querySelectorAll('.btn-listen').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const scene = parseInt(btn.dataset.scene, 10);
+      speakScene(scene, btn);
+    });
+  });
+
+  if (synth) {
+    synth.onvoiceschanged = () => { /* Carrega as vozes no Chrome */ };
+  }
+
+  window.addEventListener('beforeunload', () => {
+    if (synth) synth.cancel();
+  });
+</script>
+
+</body>
+</html>
